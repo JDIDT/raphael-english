@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raphael's English Quest – Lesson 4: Future Builders</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-dark: #1a1a2e;
+  --bg-mid: #16213e;
+  --bg-card: #0f3460;
+  --bg-card-alt: #1a3a5c;
+  --green: #4ade80;
+  --green-dim: #22c55e;
+  --gold: #fbbf24;
+  --gold-dim: #f59e0b;
+  --red: #f87171;
+  --blue: #60a5fa;
+  --purple: #c084fc;
+  --white: #f0fdf4;
+  --muted: #94a3b8;
+  --pixel-border: 4px solid #4ade80;
+  --font-pixel: 'Press Start 2P', monospace;
+  --font-body: 'Nunito', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg-dark);
+  color: var(--white);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+#xp-strip {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: var(--bg-mid);
+  border-bottom: 3px solid var(--green);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 18px; height: 48px;
+  font-family: var(--font-pixel); font-size: .65rem;
+}
+#xp-strip .xp-label { color: var(--gold); }
+#xp-strip .xp-bar-track {
+  flex: 1; margin: 0 14px; height: 18px;
+  background: #0d1b2a; border: 2px solid var(--green-dim); border-radius: 2px;
+}
+#xp-strip .xp-bar-fill {
+  height: 100%; width: 0%; background: linear-gradient(90deg, var(--green-dim), var(--gold));
+  transition: width .6s ease; border-radius: 1px;
+}
+#xp-strip .xp-num { color: var(--green); min-width: 80px; text-align: right; }
+#xp-strip .level-badge {
+  background: var(--gold); color: var(--bg-dark); padding: 2px 10px;
+  border-radius: 2px; margin-left: 10px; font-size: .55rem;
+}
+.screen { display: none; padding: 68px 20px 40px; max-width: 860px; margin: 0 auto; }
+.screen.active { display: block; animation: fadeUp .45s ease; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+h1.pixel { font-family: var(--font-pixel); font-size: 1.3rem; color: var(--green); text-align: center; line-height: 1.7; margin-bottom: 6px; }
+h2.pixel { font-family: var(--font-pixel); font-size: .85rem; color: var(--gold); margin-bottom: 18px; text-align: center; }
+h3.section { font-family: var(--font-pixel); font-size: .7rem; color: var(--green); margin: 28px 0 12px; letter-spacing: 1px; }
+p.intro { text-align: center; color: var(--muted); font-size: 1.05rem; margin-bottom: 28px; line-height: 1.6; }
+.card {
+  background: var(--bg-card); border: var(--pixel-border); border-radius: 6px;
+  padding: 22px 26px; margin-bottom: 18px;
+}
+.card.alt { background: var(--bg-card-alt); border-color: var(--gold); }
+.card.teacher {
+  border-color: var(--purple); background: rgba(192,132,252,.08);
+  margin-top: 14px;
+}
+.card.teacher::before { content: '🎓 TEACHER NOTE: '; font-weight: 800; color: var(--purple); }
+.btn {
+  font-family: var(--font-pixel); font-size: .65rem; padding: 14px 28px;
+  border: 3px solid var(--green); background: transparent; color: var(--green);
+  cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
+  transition: all .2s;
+}
+.btn:hover { background: var(--green); color: var(--bg-dark); transform: scale(1.04); }
+.btn.gold { border-color: var(--gold); color: var(--gold); }
+.btn.gold:hover { background: var(--gold); color: var(--bg-dark); }
+.btn.small { font-size: .5rem; padding: 8px 16px; }
+.btn:disabled { opacity: .35; cursor: default; transform: none; }
+.btn-row { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin: 22px 0; }
+.opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
+.opt-btn {
+  font-family: var(--font-body); font-size: 1rem; font-weight: 700;
+  padding: 16px; border: 3px solid var(--muted); border-radius: 6px;
+  background: var(--bg-card); color: var(--white); cursor: pointer;
+  transition: all .2s; text-align: center;
+}
+.opt-btn:hover { border-color: var(--green); background: rgba(74,222,128,.08); }
+.opt-btn.correct { border-color: var(--green); background: rgba(74,222,128,.18); color: var(--green); }
+.opt-btn.wrong { border-color: var(--red); background: rgba(248,113,113,.12); color: var(--red); }
+.opt-btn.disabled { pointer-events: none; }
+.text-input {
+  width: 100%; padding: 14px 18px; font-size: 1.05rem; font-family: var(--font-body);
+  background: #0d1b2a; border: 2px solid var(--muted); border-radius: 6px;
+  color: var(--white); margin: 8px 0;
+}
+.text-input:focus { outline: none; border-color: var(--green); }
+.verb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(135px,1fr)); gap: 10px; margin: 14px 0; }
+.verb-chip {
+  padding: 12px 10px; text-align: center; font-weight: 700; font-size: .95rem;
+  border-radius: 6px; cursor: pointer; border: 3px solid var(--muted);
+  background: var(--bg-card); transition: all .2s; user-select: none;
+}
+.verb-chip:hover { border-color: var(--blue); }
+.verb-chip.placed { opacity: .35; pointer-events: none; }
+.verb-chip.correct-chip { border-color: var(--green); background: rgba(74,222,128,.12); }
+.verb-chip.wrong-chip { border-color: var(--red); background: rgba(248,113,113,.12); }
+.drop-zones { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px; }
+.drop-zone {
+  border: 3px dashed var(--muted); border-radius: 8px; padding: 14px;
+  min-height: 120px; text-align: center;
+}
+.drop-zone h4 { font-family: var(--font-pixel); font-size: .55rem; color: var(--gold); margin-bottom: 10px; }
+.drop-zone .slot { padding: 6px; margin: 4px; display: inline-block; font-weight: 700; font-size: .9rem; }
+.boss-bar { margin: 20px 0; }
+.boss-bar-label { font-family: var(--font-pixel); font-size: .6rem; color: var(--red); margin-bottom: 6px; }
+.boss-bar-track { height: 26px; background: #1e1e2e; border: 2px solid var(--red); border-radius: 4px; }
+.boss-bar-fill { height: 100%; background: linear-gradient(90deg, var(--red), #fbbf24); transition: width .5s; border-radius: 2px; }
+.turn-banner {
+  text-align: center; font-family: var(--font-pixel); font-size: .7rem;
+  padding: 12px; border-radius: 6px; margin: 16px 0;
+}
+.turn-banner.raphael { background: rgba(74,222,128,.12); color: var(--green); border: 2px solid var(--green); }
+.turn-banner.teacher { background: rgba(192,132,252,.12); color: var(--purple); border: 2px solid var(--purple); }
+.feedback {
+  text-align: center; font-family: var(--font-pixel); font-size: .6rem;
+  padding: 14px; border-radius: 6px; margin: 14px 0; display: none;
+}
+.feedback.show { display: block; animation: fadeUp .3s ease; }
+.feedback.yay { background: rgba(74,222,128,.12); color: var(--green); border: 2px solid var(--green); }
+.feedback.oops { background: rgba(248,113,113,.1); color: var(--red); border: 2px solid var(--red); }
+.feedback.info { background: rgba(96,165,250,.1); color: var(--blue); border: 2px solid var(--blue); }
+.confetti-piece {
+  position: fixed; width: 10px; height: 10px; z-index: 200;
+  animation: confettiFall 2.5s ease-out forwards;
+}
+@keyframes confettiFall {
+  0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+.progress-dots { display: flex; justify-content: center; gap: 10px; margin: 18px 0; }
+.dot {
+  width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--muted);
+  background: transparent; transition: all .3s; font-size: 0;
+}
+.dot.done { background: var(--green); border-color: var(--green); }
+.dot.active { border-color: var(--gold); box-shadow: 0 0 8px var(--gold); }
+.emoji-big { font-size: 3rem; text-align: center; margin: 14px 0; }
+.highlight { color: var(--gold); font-weight: 800; }
+.french { color: var(--blue); font-style: italic; }
+.gap { height: 18px; }
+.columns { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+@media (max-width: 600px) {
+  .columns, .opt-grid, .drop-zones { grid-template-columns: 1fr; }
+  h1.pixel { font-size: .95rem; }
+  .btn { font-size: .5rem; padding: 10px 18px; }
+}
+.sentence-bank { display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
+.sentence-row { display: flex; align-items: center; gap: 10px; }
+.sentence-row .num { font-family: var(--font-pixel); font-size: .5rem; color: var(--gold); min-width: 24px; }
+.score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 18px 0; }
+.score-card { text-align: center; padding: 18px; border-radius: 8px; border: 2px solid var(--muted); }
+.score-card .big { font-family: var(--font-pixel); font-size: 1.3rem; color: var(--gold); }
+.score-card .lbl { font-size: .85rem; color: var(--muted); margin-top: 6px; }
+.parent-section { background: rgba(96,165,250,.06); border: 2px solid var(--blue); border-radius: 8px; padding: 24px; margin-top: 24px; }
+.parent-section h3 { color: var(--blue); font-family: var(--font-pixel); font-size: .65rem; margin-bottom: 14px; }
+.parent-section ul { list-style: none; padding: 0; }
+.parent-section li { padding: 6px 0; color: var(--muted); font-size: .95rem; }
+.parent-section li::before { content: '✦ '; color: var(--blue); }
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div id="xp-strip">
+  <span class="xp-label">XP</span>
+  <div class="xp-bar-track"><div class="xp-bar-fill" id="xpFill"></div></div>
+  <span class="xp-num" id="xpNum">0 / 440</span>
+  <span class="level-badge" id="lvlBadge">LVL 1</span>
+</div>
+
+<div class="screen active" id="scrTitle">
+  <div class="emoji-big">⛏️🌍</div>
+  <h1 class="pixel">Future Builders</h1>
+  <h2 class="pixel">Lesson 4 – Plan Your Next Adventure</h2>
+  <p class="intro">Today you and your teacher team up to explore the <span class="highlight">future tense</span>. Build sentences, defeat the Ender Dragon quiz, and earn up to <span class="highlight">440 XP</span>!</p>
+  <div class="card alt" style="text-align:center">
+    <p style="margin-bottom:12px;font-weight:700">Who is playing?</p>
+    <div class="btn-row">
+      <button class="btn" onclick="startGame('raphael')">I'm Raphael 🧑‍💻</button>
+      <button class="btn gold" onclick="startGame('teacher')">I'm the Teacher 🎓</button>
+      <button class="btn" onclick="startGame('together')" style="border-color:var(--blue);color:var(--blue)">Playing Together 🤝</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="scrBrief">
+  <h1 class="pixel">Mission Briefing</h1>
+  <div class="progress-dots" id="progDots"></div>
+  <div class="card">
+    <h3 class="section">⚔️ Today's Quest</h3>
+    <ul style="list-style:none;padding:0;line-height:2.2">
+      <li>🔁 <strong>Level 1</strong> – Past Tense Recall (warm-up)</li>
+      <li>🔮 <strong>Level 2</strong> – Future Forge: <em>will</em> &amp; <em>going to</em></li>
+      <li>👅 <strong>Level 3</strong> – Pronunciation Peak: TH + word stress</li>
+      <li>🤝 <strong>Level 4</strong> – Co-op Build: plan a Minecraft adventure together</li>
+      <li>🐉 <strong>Level 5</strong> – Ender Dragon Quiz (boss battle!)</li>
+    </ul>
+  </div>
+  <div class="card teacher">Let Raphael read the objectives aloud. Ask: "Which level are you most excited about?" This builds anticipation and low-pressure speaking.</div>
+  <div class="btn-row"><button class="btn gold" onclick="goScreen('scrLvl1')">Begin Quest ⚔️</button></div>
+</div>
+
+<div class="screen" id="scrLvl1">
+  <h1 class="pixel">Level 1</h1>
+  <h2 class="pixel">Past Tense Recall ⚡</h2>
+  <p class="intro">Sort each verb into <span class="highlight">Present</span> or <span class="highlight">Past</span>. Tap a verb, then tap the correct column!</p>
+  <div class="drop-zones">
+    <div class="drop-zone" id="zonePresent" onclick="dropInZone('present')"><h4>Present ➡️</h4><div id="presentSlots"></div></div>
+    <div class="drop-zone" id="zonePast" onclick="dropInZone('past')"><h4>⬅️ Past</h4><div id="pastSlots"></div></div>
+  </div>
+  <div class="verb-grid" id="verbGrid"></div>
+  <div class="feedback" id="fb1"></div>
+  <div class="card teacher">If Raphael hesitates, give the first sound: "g-g-g…" for "gave." Celebrate speed but prioritise accuracy. Award partial XP for self-corrections.</div>
+  <div class="btn-row"><button class="btn gold hidden" id="lvl1Next" onclick="goScreen('scrLvl2')">Next Level →</button></div>
+</div>
+
+<div class="screen" id="scrLvl2">
+  <h1 class="pixel">Level 2</h1>
+  <h2 class="pixel">The Future Forge 🔮</h2>
+  <div class="card" id="l2lesson">
+    <h3 class="section">📖 Two Ways to Talk About the Future</h3>
+    <div class="columns">
+      <div>
+        <p style="font-weight:800;color:var(--gold);margin-bottom:8px">WILL + base verb</p>
+        <p style="color:var(--muted);margin-bottom:8px;font-size:.9rem">Spontaneous decisions, promises, predictions</p>
+        <ul style="list-style:none;padding:0;line-height:2">
+          <li>✦ I <span class="highlight">will help</span> you build a house.</li>
+          <li>✦ She <span class="highlight">will find</span> diamonds.</li>
+          <li>✦ It <span class="highlight">won't</span> rain tomorrow.</li>
+        </ul>
+      </div>
+      <div>
+        <p style="font-weight:800;color:var(--blue);margin-bottom:8px">GOING TO + base verb</p>
+        <p style="color:var(--muted);margin-bottom:8px;font-size:.9rem">Plans you already made, evidence-based predictions</p>
+        <ul style="list-style:none;padding:0;line-height:2">
+          <li>✦ I <span class="highlight">am going to</span> explore the cave.</li>
+          <li>✦ We <span class="highlight">are going to</span> craft armour.</li>
+          <li>✦ He <span class="highlight">isn't going to</span> fight the dragon.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="french" style="margin-top:14px">🇫🇷 "Je vais explorer" ≈ "I am going to explore" — same structure!</p>
+  </div>
+  <div class="card alt" id="l2fill">
+    <h3 class="section">🛠️ Forge Your Sentences</h3>
+    <p style="color:var(--muted);margin-bottom:14px">Choose <strong class="highlight">will</strong> or <strong style="color:var(--blue)">going to</strong> for each sentence.</p>
+    <div id="fillContainer"></div>
+    <div class="feedback" id="fb2"></div>
+  </div>
+  <div class="card" id="l2crystal">
+    <h3 class="section">🔮 Crystal Ball – Free Speak</h3>
+    <p style="color:var(--muted);margin-bottom:12px">Roll the crystal ball, get a topic, and say a future-tense sentence!</p>
+    <div style="text-align:center">
+      <div id="crystalTopic" style="font-size:1.5rem;font-weight:800;color:var(--gold);margin:16px 0">—</div>
+      <button class="btn" onclick="rollCrystal()">🔮 Roll Crystal Ball</button>
+    </div>
+    <div class="turn-banner raphael" style="margin-top:16px" id="crystalTurn">Raphael's turn – say a sentence!</div>
+    <div class="feedback" id="fb2c"></div>
+    <div class="btn-row" style="margin-top:10px">
+      <button class="btn small" onclick="crystalCorrect()">✅ Good sentence (+15 XP)</button>
+      <button class="btn small gold" onclick="crystalRetry()">🔄 Try again</button>
+    </div>
+    <p id="crystalCount" style="text-align:center;color:var(--muted);font-size:.85rem;margin-top:8px">Sentences completed: 0 / 6</p>
+  </div>
+  <div class="card teacher">During Crystal Ball, alternate turns. Model one sentence first, then let Raphael go. Accept any correct future form. Gently recast: "Almost! You could say: I will…"</div>
+  <div class="btn-row"><button class="btn gold hidden" id="lvl2Next" onclick="goScreen('scrLvl3')">Next Level →</button></div>
+</div>
+
+<div class="screen" id="scrLvl3">
+  <h1 class="pixel">Level 3</h1>
+  <h2 class="pixel">Pronunciation Peak 👅</h2>
+  <div class="card">
+    <h3 class="section">🔊 TH Review – Quick Fire</h3>
+    <p style="color:var(--muted);margin-bottom:12px">Tap each word and say it out loud. Is it <strong style="color:var(--green)">Voiced TH</strong> (throat vibrates) or <strong style="color:var(--gold)">Voiceless TH</strong> (air only)?</p>
+    <div class="verb-grid" id="thGrid"></div>
+    <div class="feedback" id="fb3a"></div>
+  </div>
+  <div class="card alt">
+    <h3 class="section">🎯 New Skill: Word Stress</h3>
+    <p style="color:var(--muted);margin-bottom:12px">In English, one syllable in each word is <strong class="highlight">LOUDER and LONGER</strong>. Tap the stressed syllable!</p>
+    <div id="stressContainer"></div>
+    <div class="feedback" id="fb3b"></div>
+  </div>
+  <div class="card">
+    <h3 class="section">🌪️ Tongue Twister Speed Run</h3>
+    <p style="color:var(--muted);margin-bottom:10px">Type this tongue twister as fast as you can — the timer is running!</p>
+    <p style="font-size:1.15rem;font-weight:800;color:var(--gold);text-align:center;margin:14px 0" id="twister"></p>
+    <input class="text-input" id="twisterInput" placeholder="Type the tongue twister here…" autocomplete="off">
+    <div style="text-align:center;margin:10px 0">
+      <span style="font-family:var(--font-pixel);font-size:.7rem;color:var(--green)" id="twisterTimer">⏱ 0.0s</span>
+    </div>
+    <div class="feedback" id="fb3c"></div>
+  </div>
+  <div class="card teacher">For word stress, clap or tap the table on the stressed syllable. Exaggerate: "to-MOR-row." Have Raphael mimic. For the tongue twister, keep it playful — laugh at mistakes together.</div>
+  <div class="btn-row"><button class="btn gold hidden" id="lvl3Next" onclick="goScreen('scrLvl4')">Next Level →</button></div>
+</div>
+
+<div class="screen" id="scrLvl4">
+  <h1 class="pixel">Level 4</h1>
+  <h2 class="pixel">Co-op Adventure Planner 🤝</h2>
+  <p class="intro">Plan an epic Minecraft adventure <strong>together</strong> using future-tense sentences! Take turns — one person writes a plan sentence, the other asks a follow-up question.</p>
+  <div class="turn-banner raphael" id="coopTurn">🧑‍💻 Raphael's Turn – Write a plan sentence!</div>
+  <div class="card" id="coopCard">
+    <div class="sentence-bank" id="coopSentences"></div>
+    <input class="text-input" id="coopInput" placeholder="Type your sentence here…">
+    <div class="btn-row">
+      <button class="btn" id="coopSubmit" onclick="submitCoopSentence()">Submit ✏️</button>
+    </div>
+    <div class="feedback" id="fb4"></div>
+  </div>
+  <div class="card alt">
+    <h3 class="section">💡 Sentence Starters</h3>
+    <div class="columns">
+      <div>
+        <p style="font-weight:700;color:var(--gold);margin-bottom:6px">Plan sentences:</p>
+        <p style="color:var(--muted);font-size:.9rem;line-height:1.8">We will explore the jungle.<br>I am going to craft a shield.<br>She will tame a wolf.<br>They are going to build a bridge.</p>
+      </div>
+      <div>
+        <p style="font-weight:700;color:var(--blue);margin-bottom:6px">Follow-up questions:</p>
+        <p style="color:var(--muted);font-size:.9rem;line-height:1.8">Will you bring food?<br>Where are you going to build it?<br>What will you do if you see a creeper?<br>Are we going to fight the dragon?</p>
+      </div>
+    </div>
+  </div>
+  <div class="card teacher">Award 15 XP per good sentence. If Raphael mixes up "will" and "going to," accept both — accuracy in form matters more than the nuance right now. Prompt follow-up questions to keep it conversational.</div>
+  <div class="btn-row"><button class="btn gold hidden" id="lvl4Next" onclick="goScreen('scrLvl5')">Next Level →</button></div>
+</div>
+
+<div class="screen" id="scrLvl5">
+  <h1 class="pixel">Level 5</h1>
+  <h2 class="pixel">Ender Dragon Quiz 🐉</h2>
+  <div class="boss-bar"><span class="boss-bar-label">🐉 Dragon HP</span><div class="boss-bar-track"><div class="boss-bar-fill" id="bossHP" style="width:100%"></div></div></div>
+  <div class="card" id="quizCard">
+    <p id="quizQ" style="font-size:1.1rem;font-weight:700;margin-bottom:14px"></p>
+    <div id="quizArea"></div>
+    <div class="feedback" id="fb5"></div>
+  </div>
+  <div class="card teacher">Read each question aloud. For fill-in questions, let Raphael try before revealing the answer. Celebrate each hit on the dragon!</div>
+  <div class="btn-row"><button class="btn gold hidden" id="lvl5Next" onclick="goScreen('scrVictory')">Claim Victory! 🏆</button></div>
+</div>
+
+<div class="screen" id="scrVictory">
+  <div class="emoji-big">🏆🎉🐉</div>
+  <h1 class="pixel">Quest Complete!</h1>
+  <h2 class="pixel">The Ender Dragon is defeated!</h2>
+  <div class="score-grid">
+    <div class="score-card" style="border-color:var(--gold)"><div class="big" id="finalXP">0</div><div class="lbl">Total XP Earned</div></div>
+    <div class="score-card" style="border-color:var(--green)"><div class="big" id="finalLvl">1</div><div class="lbl">Final Level</div></div>
+    <div class="score-card" style="border-color:var(--blue)"><div class="big" id="finalAcc">0%</div><div class="lbl">Quiz Accuracy</div></div>
+    <div class="score-card" style="border-color:var(--purple)"><div class="big" id="finalStar">⭐</div><div class="lbl">Achievement</div></div>
+  </div>
+  <div class="parent-section">
+    <h3>📬 Parent Summary – Lesson 4</h3>
+    <ul>
+      <li><strong>Grammar:</strong> Future tense with "will" (spontaneous) and "going to" (planned). Question forms: "Will you…?" / "Are you going to…?"</li>
+      <li><strong>Pronunciation:</strong> TH sound review (voiced vs. voiceless) + introduction to English word stress patterns.</li>
+      <li><strong>Speaking:</strong> Co-op adventure planner — Raphael and teacher built a Minecraft plan using future tense, practising conversational turn-taking.</li>
+      <li><strong>Review:</strong> Past tense irregular verbs (Lessons 1–3) reinforced through sorting and quiz questions.</li>
+      <li><strong>Next Lesson Preview:</strong> Comparatives and superlatives — "bigger," "the biggest," "more exciting."</li>
+      <li><strong>At Home:</strong> Ask Raphael "What are you going to do tomorrow?" and "Will you…?" questions. Encourage full-sentence answers. Practise word stress by clapping syllables together.</li>
+    </ul>
+  </div>
+  <div class="btn-row" style="margin-top:24px"><button class="btn" onclick="location.reload()">Play Again 🔄</button></div>
+</div>
+
+<script>
+let xp=0,maxXP=440,role='together';
+let selected=null;
+let crystalDone=0,crystalTopics=['food','animals','Minecraft biomes','school','the weekend','sports','your family','the weather'];
+let coopTurn=0,coopSentences=[];
+let quizIdx=0,quizCorrect=0;
+let twisterStarted=false,twisterInterval=null,twisterStart=0;
+let thAnswered=0,stressDone=0;
+let lvl1Done=false,lvl2FillDone=false,lvl3THDone=false,lvl3StressDone=false,lvl3TwistDone=false;
+
+function addXP(n){
+  xp=Math.min(xp+n,maxXP);
+  document.getElementById('xpFill').style.width=(xp/maxXP*100)+'%';
+  document.getElementById('xpNum').textContent=xp+' / '+maxXP;
+  let lvl=xp<80?1:xp<180?2:xp<240?3:xp<340?4:5;
+  document.getElementById('lvlBadge').textContent='LVL '+lvl;
+}
+
+function goScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  updateDots(id);
+  if(id==='scrLvl1')initLvl1();
+  if(id==='scrLvl2')initLvl2();
+  if(id==='scrLvl3')initLvl3();
+  if(id==='scrLvl4')initLvl4();
+  if(id==='scrLvl5')initLvl5();
+  if(id==='scrVictory')showVictory();
+}
+function startGame(r){role=r;goScreen('scrBrief');buildDots();}
+
+const screenOrder=['scrBrief','scrLvl1','scrLvl2','scrLvl3','scrLvl4','scrLvl5','scrVictory'];
+function buildDots(){
+  let h='';screenOrder.forEach((_,i)=>h+=`<div class="dot" id="dot${i}"></div>`);
+  document.getElementById('progDots').innerHTML=h;updateDots('scrBrief');
+}
+function updateDots(id){
+  let idx=screenOrder.indexOf(id);
+  screenOrder.forEach((_,i)=>{
+    let d=document.getElementById('dot'+i);if(!d)return;
+    d.className='dot'+(i<idx?' done':'')+(i===idx?' active':'');
+  });
+}
+
+function confetti(){
+  const colors=['#4ade80','#fbbf24','#60a5fa','#c084fc','#f87171'];
+  for(let i=0;i<40;i++){
+    let el=document.createElement('div');el.className='confetti-piece';
+    el.style.left=Math.random()*100+'vw';el.style.top='-20px';
+    el.style.background=colors[i%colors.length];
+    el.style.animationDelay=(Math.random()*.8)+'s';
+    el.style.borderRadius=Math.random()>.5?'50%':'0';
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),3500);
+  }
+}
+function showFB(id,msg,type){
+  let el=document.getElementById(id);el.textContent=msg;
+  el.className='feedback show '+type;
+  setTimeout(()=>el.className='feedback',3500);
+}
+
+// ═══ LEVEL 1 ═══
+const verbs=[
+  {word:'go',type:'present'},{word:'went',type:'past'},
+  {word:'eat',type:'present'},{word:'ate',type:'past'},
+  {word:'see',type:'present'},{word:'saw',type:'past'},
+  {word:'make',type:'present'},{word:'made',type:'past'},
+  {word:'give',type:'present'},{word:'gave',type:'past'},
+  {word:'take',type:'present'},{word:'took',type:'past'},
+];
+let verbsSorted=0,verbsCorrect=0;
+
+function initLvl1(){
+  let shuffled=[...verbs].sort(()=>Math.random()-.5);
+  let grid=document.getElementById('verbGrid');
+  grid.innerHTML=shuffled.map((v,i)=>`<div class="verb-chip" data-idx="${i}" data-type="${v.type}" onclick="selectVerb(this)">${v.word}</div>`).join('');
+  document.getElementById('presentSlots').innerHTML='';
+  document.getElementById('pastSlots').innerHTML='';
+  verbsSorted=0;verbsCorrect=0;selected=null;
+}
+function selectVerb(el){
+  document.querySelectorAll('.verb-chip').forEach(c=>c.style.outline='none');
+  if(el.classList.contains('placed'))return;
+  selected=el;el.style.outline='3px solid var(--gold)';
+}
+function dropInZone(zone){
+  if(!selected)return;
+  let correct=selected.dataset.type===zone;
+  let target=zone==='present'?'presentSlots':'pastSlots';
+  let slot=document.createElement('span');
+  slot.className='slot';
+  slot.textContent=selected.textContent;
+  slot.style.color=correct?'var(--green)':'var(--red)';
+  document.getElementById(target).appendChild(slot);
+  selected.classList.add('placed',correct?'correct-chip':'wrong-chip');
+  verbsSorted++;
+  if(correct){verbsCorrect++;addXP(7);}
+  selected.style.outline='none';selected=null;
+  if(verbsSorted===verbs.length){
+    showFB('fb1',`Sorted! ${verbsCorrect}/${verbs.length} correct – ${verbsCorrect*7} XP earned! 🎉`,'yay');
+    document.getElementById('lvl1Next').classList.remove('hidden');
+    if(verbsCorrect>=10)confetti();
+    lvl1Done=true;
+  }
+}
+
+// ═══ LEVEL 2 ═══
+const fillData=[
+  {sentence:"I ___ visit my grandmother next Sunday. (plan)",answer:"am going to",options:["will","am going to"]},
+  {sentence:"Look at those clouds! It ___ rain. (evidence)",answer:"is going to",options:["will","is going to"]},
+  {sentence:"I'm thirsty. I ___ get some water. (spontaneous)",answer:"will",options:["will","am going to"]},
+  {sentence:"We ___ build a treehouse this summer. (plan)",answer:"are going to",options:["will","are going to"]},
+  {sentence:"I promise I ___ help you with homework. (promise)",answer:"will",options:["will","am going to"]},
+  {sentence:"She ___ start a new school in September. (plan)",answer:"is going to",options:["will","is going to"]},
+];
+let fillIdx=0,fillCorrect=0;
+
+function initLvl2(){fillIdx=0;fillCorrect=0;crystalDone=0;renderFill();}
+function renderFill(){
+  if(fillIdx>=fillData.length){
+    document.getElementById('fillContainer').innerHTML=`<p style="text-align:center;font-weight:700;color:var(--green)">All done! ${fillCorrect}/${fillData.length} correct 🎯</p>`;
+    lvl2FillDone=true;checkLvl2Done();return;
+  }
+  let q=fillData[fillIdx];
+  document.getElementById('fillContainer').innerHTML=`
+    <p style="font-size:1.05rem;margin-bottom:12px">${fillIdx+1}. ${q.sentence}</p>
+    <div class="opt-grid">${q.options.map(o=>`<div class="opt-btn" onclick="checkFill(this,'${o}','${q.answer}')">${o}</div>`).join('')}</div>
+  `;
+}
+function checkFill(el,picked,answer){
+  let correct=picked===answer;
+  el.classList.add(correct?'correct':'wrong');
+  document.querySelectorAll('#fillContainer .opt-btn').forEach(b=>b.classList.add('disabled'));
+  if(correct){fillCorrect++;addXP(10);showFB('fb2','Correct! +10 XP ⚡','yay');}
+  else showFB('fb2','Not quite — the answer is "'+answer+'"','oops');
+  setTimeout(()=>{fillIdx++;renderFill();},1400);
+}
+function rollCrystal(){
+  let t=crystalTopics[Math.floor(Math.random()*crystalTopics.length)];
+  document.getElementById('crystalTopic').textContent='🔮 '+t.toUpperCase();
+  let isRaph=crystalDone%2===0;
+  document.getElementById('crystalTurn').className='turn-banner '+(isRaph?'raphael':'teacher');
+  document.getElementById('crystalTurn').textContent=isRaph?"🧑‍💻 Raphael's turn – say a sentence!":"🎓 Teacher's turn – say a sentence!";
+}
+function crystalCorrect(){
+  crystalDone++;addXP(15);
+  document.getElementById('crystalCount').textContent='Sentences completed: '+crystalDone+' / 6';
+  showFB('fb2c','Great sentence! +15 XP 🌟','yay');
+  if(crystalDone>=6){showFB('fb2c','Crystal Ball complete! Nice teamwork! 🔮✨','yay');checkLvl2Done();}
+}
+function crystalRetry(){showFB('fb2c','No worries — try again! Use "will" or "going to" + base verb.','info');}
+function checkLvl2Done(){if(lvl2FillDone&&crystalDone>=6)document.getElementById('lvl2Next').classList.remove('hidden');}
+
+// ═══ LEVEL 3 ═══
+const thWords=[
+  {word:'this',type:'voiced'},{word:'think',type:'voiceless'},{word:'that',type:'voiced'},
+  {word:'three',type:'voiceless'},{word:'mother',type:'voiced'},{word:'teeth',type:'voiceless'},
+  {word:'they',type:'voiced'},{word:'math',type:'voiceless'},{word:'brother',type:'voiced'},{word:'thank',type:'voiceless'}
+];
+const stressWords=[
+  {word:'to·MOR·row',syllables:['to','MOR','row'],stressed:1},
+  {word:'EX·plore',syllables:['EX','plore'],stressed:0},
+  {word:'ad·VEN·ture',syllables:['ad','VEN','ture'],stressed:1},
+  {word:'DI·a·mond',syllables:['DI','a','mond'],stressed:0},
+  {word:'en·CHANT·ment',syllables:['en','CHANT','ment'],stressed:1},
+  {word:'CUR·rent·ly',syllables:['CUR','rent','ly'],stressed:0},
+];
+const twisterText="Will the three brothers think about their future together?";
+
+function initLvl3(){
+  let shuffled=[...thWords].sort(()=>Math.random()-.5);
+  let grid=document.getElementById('thGrid');
+  grid.innerHTML=shuffled.map((w,i)=>`<div class="verb-chip" onclick="guessTH(this,'${w.type}')" data-word="${w.word}">${w.word}</div>`).join('');
+  thAnswered=0;stressDone=0;lvl3THDone=false;lvl3StressDone=false;lvl3TwistDone=false;
+  renderStress();
+  document.getElementById('twister').textContent=twisterText;
+  document.getElementById('twisterInput').value='';
+  document.getElementById('twisterInput').addEventListener('input',checkTwister);
+  twisterStarted=false;
+  if(twisterInterval)clearInterval(twisterInterval);
+  document.getElementById('twisterTimer').textContent='⏱ 0.0s';
+}
+function guessTH(el,type){
+  if(el.classList.contains('placed'))return;
+  let pick=prompt('Is "'+el.dataset.word+'" Voiced TH (v) or Voiceless TH (s)?\n\nType V or S:');
+  if(!pick)return;
+  pick=pick.trim().toLowerCase();
+  let correct=(pick==='v'&&type==='voiced')||(pick==='s'&&type==='voiceless');
+  el.classList.add('placed',correct?'correct-chip':'wrong-chip');
+  el.textContent=el.dataset.word+(correct?' ✓':' ✗ ('+type+')');
+  thAnswered++;
+  if(correct)addXP(4);
+  if(thAnswered===thWords.length){
+    lvl3THDone=true;showFB('fb3a','TH review complete! 🎯','yay');checkLvl3Done();
+  }
+}
+let stressIdx=0;
+function renderStress(){
+  if(stressIdx>=stressWords.length){
+    document.getElementById('stressContainer').innerHTML=`<p style="text-align:center;color:var(--green);font-weight:700">Word stress complete! Great ear! 👂</p>`;
+    lvl3StressDone=true;checkLvl3Done();return;
+  }
+  let w=stressWords[stressIdx];
+  document.getElementById('stressContainer').innerHTML=`
+    <p style="margin-bottom:10px;color:var(--muted)">Tap the <strong>stressed</strong> syllable:</p>
+    <div class="opt-grid" style="grid-template-columns:repeat(${w.syllables.length},1fr)">
+      ${w.syllables.map((s,i)=>`<div class="opt-btn" onclick="checkStress(${i},${w.stressed},'${s}')">${s}</div>`).join('')}
+    </div>
+  `;
+}
+function checkStress(picked,correct,label){
+  let btns=document.querySelectorAll('#stressContainer .opt-btn');
+  btns.forEach((b,i)=>{b.classList.add(i===correct?'correct':'disabled');if(i===picked&&i!==correct)b.classList.add('wrong');});
+  if(picked===correct){addXP(8);showFB('fb3b','Correct! "'+stressWords[stressIdx].syllables[correct]+'" is stressed. +8 XP','yay');}
+  else showFB('fb3b','The stressed syllable is "'+stressWords[stressIdx].syllables[correct]+'"','oops');
+  setTimeout(()=>{stressIdx++;renderStress();},1500);
+}
+function checkTwister(){
+  if(!twisterStarted){
+    twisterStarted=true;twisterStart=Date.now();
+    twisterInterval=setInterval(()=>{
+      let s=((Date.now()-twisterStart)/1000).toFixed(1);
+      document.getElementById('twisterTimer').textContent='⏱ '+s+'s';
+    },100);
+  }
+  let val=document.getElementById('twisterInput').value.trim().toLowerCase().replace(/[^a-z ]/g,'');
+  let target=twisterText.toLowerCase().replace(/[^a-z ]/g,'');
+  if(val===target){
+    clearInterval(twisterInterval);
+    let secs=((Date.now()-twisterStart)/1000).toFixed(1);
+    let bonus=secs<15?20:secs<25?12:6;
+    addXP(bonus);
+    showFB('fb3c',`Done in ${secs}s! +${bonus} XP ${secs<15?'🚀 BLAZING!':secs<25?'🐇 Quick!':'🐢 Steady!'}`,'yay');
+    lvl3TwistDone=true;checkLvl3Done();
+  }
+}
+function checkLvl3Done(){if(lvl3THDone&&lvl3StressDone&&lvl3TwistDone)document.getElementById('lvl3Next').classList.remove('hidden');}
+
+// ═══ LEVEL 4 ═══
+function initLvl4(){
+  coopTurn=0;coopSentences=[];
+  document.getElementById('coopSentences').innerHTML='';
+  document.getElementById('coopInput').value='';
+  updateCoopTurn();
+}
+function updateCoopTurn(){
+  let isRaph=coopTurn%2===0;
+  let banner=document.getElementById('coopTurn');
+  let turnType=coopTurn%4<2?'plan sentence':'follow-up question';
+  banner.className='turn-banner '+(isRaph?'raphael':'teacher');
+  banner.textContent=(isRaph?"🧑‍💻 Raphael":"🎓 Teacher")+"'s Turn – Write a "+turnType+"!";
+}
+function submitCoopSentence(){
+  let input=document.getElementById('coopInput');
+  let val=input.value.trim();
+  if(!val)return;
+  let isRaph=coopTurn%2===0;
+  coopSentences.push({text:val,who:isRaph?'Raphael':'Teacher'});
+  let bank=document.getElementById('coopSentences');
+  let row=document.createElement('div');row.className='sentence-row';
+  row.innerHTML=`<span class="num">${coopSentences.length}.</span><span style="color:${isRaph?'var(--green)':'var(--purple)'};font-weight:700">[${isRaph?'R':'T'}]</span><span>${val}</span>`;
+  bank.appendChild(row);
+  input.value='';
+  addXP(12);
+  showFB('fb4','Nice! +12 XP 🧱','yay');
+  coopTurn++;
+  if(coopSentences.length>=8){
+    showFB('fb4','Adventure plan complete! Great teamwork! 🤝✨','yay');
+    document.getElementById('lvl4Next').classList.remove('hidden');
+    confetti();
+  }
+  updateCoopTurn();
+}
+
+// ═══ LEVEL 5 ═══
+const quizData=[
+  {q:"Which is correct?",type:"mc",options:["I will to go home.","I will go home.","I will going home.","I will went home."],answer:1},
+  {q:"Fill in: She ___ going to visit Paris next year.",type:"fill",answer:"is"},
+  {q:"Past or future? 'I ate a big breakfast.'",type:"mc",options:["Past","Future"],answer:0},
+  {q:"Make this negative: 'I will play football.'",type:"fill",answer:"I will not play football"},
+  {q:"Which sentence is about a PLAN?",type:"mc",options:["I think it will rain.","I am going to study French tonight.","It will be sunny.","He will probably win."],answer:1},
+  {q:"Fill in: ___ you going to come to the party?",type:"fill",answer:"Are"},
+  {q:"Choose the correct TH type for 'THINK':",type:"mc",options:["Voiced TH","Voiceless TH"],answer:1},
+  {q:"Fix this sentence: 'Did you went to school?'",type:"fill",answer:"Did you go to school"},
+  {q:"Which word has stress on the SECOND syllable?",type:"mc",options:["DI-a-mond","to-MOR-row","CUR-rent-ly","BEAU-ti-ful"],answer:1},
+  {q:"Write a future sentence about Minecraft using 'will':",type:"fill",answer:"*"},
+];
+
+function initLvl5(){
+  quizIdx=0;quizCorrect=0;
+  document.getElementById('bossHP').style.width='100%';
+  renderQuiz();
+}
+function renderQuiz(){
+  if(quizIdx>=quizData.length){
+    document.getElementById('quizCard').innerHTML=`<div style="text-align:center"><p style="font-size:1.3rem;font-weight:800;color:var(--green)">🐉 The Ender Dragon is defeated!</p><p style="color:var(--muted);margin-top:10px">You got ${quizCorrect}/${quizData.length} correct!</p></div>`;
+    document.getElementById('lvl5Next').classList.remove('hidden');
+    confetti();return;
+  }
+  let q=quizData[quizIdx];
+  document.getElementById('quizQ').textContent=`Q${quizIdx+1}/${quizData.length}: ${q.q}`;
+  if(q.type==='mc'){
+    document.getElementById('quizArea').innerHTML=`<div class="opt-grid">${q.options.map((o,i)=>`<div class="opt-btn" onclick="answerQuiz(${i},${q.answer})">${o}</div>`).join('')}</div>`;
+  }else{
+    document.getElementById('quizArea').innerHTML=`<input class="text-input" id="quizFill" placeholder="Type your answer…" autocomplete="off"><div class="btn-row"><button class="btn small" onclick="checkQuizFill()">Submit</button></div>`;
+  }
+}
+function answerQuiz(picked,correct){
+  let btns=document.querySelectorAll('#quizArea .opt-btn');
+  btns.forEach((b,i)=>{b.classList.add(i===correct?'correct':'disabled');if(i===picked&&i!==correct)b.classList.add('wrong');});
+  if(picked===correct){quizCorrect++;addXP(12);showFB('fb5','Direct hit! +12 XP 🗡️','yay');}
+  else showFB('fb5','Missed! The answer was highlighted in green.','oops');
+  document.getElementById('bossHP').style.width=Math.max(0,100-((quizIdx+1)/quizData.length*100))+'%';
+  setTimeout(()=>{quizIdx++;renderQuiz();},1600);
+}
+function checkQuizFill(){
+  let val=document.getElementById('quizFill').value.trim().toLowerCase().replace(/[?.!]/g,'');
+  let answer=quizData[quizIdx].answer.toLowerCase().replace(/[?.!]/g,'');
+  let correct=answer==='*'?val.includes('will'):val===answer;
+  if(answer==='*'&&val.length>4)correct=true;
+  if(correct){quizCorrect++;addXP(12);showFB('fb5','Correct! +12 XP 🗡️','yay');}
+  else{
+    let hint=answer==='*'?'Any sentence with "will" works!':`Answer: "${quizData[quizIdx].answer}"`;
+    showFB('fb5','Not quite. '+hint,'oops');
+  }
+  document.getElementById('bossHP').style.width=Math.max(0,100-((quizIdx+1)/quizData.length*100))+'%';
+  setTimeout(()=>{quizIdx++;renderQuiz();},1800);
+}
+
+function showVictory(){
+  confetti();setTimeout(confetti,800);setTimeout(confetti,1600);
+  document.getElementById('finalXP').textContent=xp;
+  let lvl=xp<80?1:xp<180?2:xp<240?3:xp<340?4:5;
+  document.getElementById('finalLvl').textContent=lvl;
+  let acc=quizData.length>0?Math.round(quizCorrect/quizData.length*100):0;
+  document.getElementById('finalAcc').textContent=acc+'%';
+  let star=xp>=380?'🌟🌟🌟':xp>=280?'🌟🌟':xp>=150?'🌟':'Keep going!';
+  document.getElementById('finalStar').textContent=star;
+}
+</script>
+</body>
+</html>
