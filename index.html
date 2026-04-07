@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Raphael's English Quest – Lesson 4: Future Builders</title>
+<title>English Quest – Lesson 4: Future Builders</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -126,7 +126,7 @@ p.intro { text-align: center; color: var(--muted); font-size: 1.05rem; margin-bo
   text-align: center; font-family: var(--font-pixel); font-size: .7rem;
   padding: 12px; border-radius: 6px; margin: 16px 0;
 }
-.turn-banner.raphael { background: rgba(74,222,128,.12); color: var(--green); border: 2px solid var(--green); }
+.turn-banner.student { background: rgba(74,222,128,.12); color: var(--green); border: 2px solid var(--green); }
 .turn-banner.teacher { background: rgba(192,132,252,.12); color: var(--purple); border: 2px solid var(--purple); }
 .feedback {
   text-align: center; font-family: var(--font-pixel); font-size: .6rem;
@@ -193,7 +193,7 @@ p.intro { text-align: center; color: var(--muted); font-size: 1.05rem; margin-bo
   <div class="card alt" style="text-align:center">
     <p style="margin-bottom:12px;font-weight:700">Who is playing?</p>
     <div class="btn-row">
-      <button class="btn" onclick="startGame('raphael')">I'm Raphael 🧑‍💻</button>
+      <button class="btn" onclick="startGame('student')">I'm the Student 🧑‍💻</button>
       <button class="btn gold" onclick="startGame('teacher')">I'm the Teacher 🎓</button>
       <button class="btn" onclick="startGame('together')" style="border-color:var(--blue);color:var(--blue)">Playing Together 🤝</button>
     </div>
@@ -213,7 +213,7 @@ p.intro { text-align: center; color: var(--muted); font-size: 1.05rem; margin-bo
       <li>🐉 <strong>Level 5</strong> – Ender Dragon Quiz (boss battle!)</li>
     </ul>
   </div>
-  <div class="card teacher">Let Raphael read the objectives aloud. Ask: "Which level are you most excited about?" This builds anticipation and low-pressure speaking.</div>
+  <div class="card teacher">Let the student read the objectives aloud. Ask: "Which level are you most excited about?" This builds anticipation and low-pressure speaking.</div>
   <div class="btn-row"><button class="btn gold" onclick="goScreen('scrLvl1')">Begin Quest ⚔️</button></div>
 </div>
 
@@ -227,7 +227,7 @@ p.intro { text-align: center; color: var(--muted); font-size: 1.05rem; margin-bo
   </div>
   <div class="verb-grid" id="verbGrid"></div>
   <div class="feedback" id="fb1"></div>
-  <div class="card teacher">If Raphael hesitates, give the first sound: "g-g-g…" for "gave." Celebrate speed but prioritise accuracy. Award partial XP for self-corrections.</div>
+  <div class="card teacher">If the student hesitates, give the first sound: "g-g-g…" for "gave." Celebrate speed but prioritise accuracy. Award partial XP for self-corrections.</div>
   <div class="btn-row"><button class="btn gold hidden" id="lvl1Next" onclick="goScreen('scrLvl2')">Next Level →</button></div>
 </div>
 
@@ -271,7 +271,7 @@ p.intro { text-align: center; color: var(--muted); font-size: 1.05rem; margin-bo
       <div id="crystalTopic" style="font-size:1.5rem;font-weight:800;color:var(--gold);margin:16px 0">—</div>
       <button class="btn" onclick="rollCrystal()">🔮 Roll Crystal Ball</button>
     </div>
-    <div class="turn-banner raphael" style="margin-top:16px" id="crystalTurn">Raphael's turn – say a sentence!</div>
+    <div class="turn-banner student" style="margin-top:16px" id="crystalTurn">The student's turn – say a sentence!</div>
     <div class="feedback" id="fb2c"></div>
     <div class="btn-row" style="margin-top:10px">
       <button class="btn small" onclick="crystalCorrect()">✅ Good sentence (+15 XP)</button>
@@ -279,7 +279,7 @@ p.intro { text-align: center; color: var(--muted); font-size: 1.05rem; margin-bo
     </div>
     <p id="crystalCount" style="text-align:center;color:var(--muted);font-size:.85rem;margin-top:8px">Sentences completed: 0 / 6</p>
   </div>
-  <div class="card teacher">During Crystal Ball, alternate turns. Model one sentence first, then let Raphael go. Accept any correct future form. Gently recast: "Almost! You could say: I will…"</div>
+  <div class="card teacher">During Crystal Ball, alternate turns. Model one sentence first, then let the student go. Accept any correct future form. Gently recast: "Almost! You could say: I will…"</div>
   <div class="btn-row"><button class="btn gold hidden" id="lvl2Next" onclick="goScreen('scrLvl3')">Next Level →</button></div>
 </div>
 
@@ -308,7 +308,7 @@ p.intro { text-align: center; color: var(--muted); font-size: 1.05rem; margin-bo
     </div>
     <div class="feedback" id="fb3c"></div>
   </div>
-  <div class="card teacher">For word stress, clap or tap the table on the stressed syllable. Exaggerate: "to-MOR-row." Have Raphael mimic. For the tongue twister, keep it playful — laugh at mistakes together.</div>
+  <div class="card teacher">For word stress, clap or tap the table on the stressed syllable. Exaggerate: "to-MOR-row." Have the student mimic. For the tongue twister, keep it playful — laugh at mistakes together.</div>
   <div class="btn-row"><button class="btn gold hidden" id="lvl3Next" onclick="goScreen('scrLvl4')">Next Level →</button></div>
 </div>
 
@@ -316,7 +316,7 @@ p.intro { text-align: center; color: var(--muted); font-size: 1.05rem; margin-bo
   <h1 class="pixel">Level 4</h1>
   <h2 class="pixel">Co-op Adventure Planner 🤝</h2>
   <p class="intro">Plan an epic Minecraft adventure <strong>together</strong> using future-tense sentences! Take turns — one person writes a plan sentence, the other asks a follow-up question.</p>
-  <div class="turn-banner raphael" id="coopTurn">🧑‍💻 Raphael's Turn – Write a plan sentence!</div>
+  <div class="turn-banner student" id="coopTurn">🧑‍💻 The student's Turn – Write a plan sentence!</div>
   <div class="card" id="coopCard">
     <div class="sentence-bank" id="coopSentences"></div>
     <input class="text-input" id="coopInput" placeholder="Type your sentence here…">
@@ -338,7 +338,7 @@ p.intro { text-align: center; color: var(--muted); font-size: 1.05rem; margin-bo
       </div>
     </div>
   </div>
-  <div class="card teacher">Award 15 XP per good sentence. If Raphael mixes up "will" and "going to," accept both — accuracy in form matters more than the nuance right now. Prompt follow-up questions to keep it conversational.</div>
+  <div class="card teacher">Award 15 XP per good sentence. If the student mixes up "will" and "going to," accept both — accuracy in form matters more than the nuance right now. Prompt follow-up questions to keep it conversational.</div>
   <div class="btn-row"><button class="btn gold hidden" id="lvl4Next" onclick="goScreen('scrLvl5')">Next Level →</button></div>
 </div>
 
@@ -351,7 +351,7 @@ p.intro { text-align: center; color: var(--muted); font-size: 1.05rem; margin-bo
     <div id="quizArea"></div>
     <div class="feedback" id="fb5"></div>
   </div>
-  <div class="card teacher">Read each question aloud. For fill-in questions, let Raphael try before revealing the answer. Celebrate each hit on the dragon!</div>
+  <div class="card teacher">Read each question aloud. For fill-in questions, let the student try before revealing the answer. Celebrate each hit on the dragon!</div>
   <div class="btn-row"><button class="btn gold hidden" id="lvl5Next" onclick="goScreen('scrVictory')">Claim Victory! 🏆</button></div>
 </div>
 
@@ -370,10 +370,10 @@ p.intro { text-align: center; color: var(--muted); font-size: 1.05rem; margin-bo
     <ul>
       <li><strong>Grammar:</strong> Future tense with "will" (spontaneous) and "going to" (planned). Question forms: "Will you…?" / "Are you going to…?"</li>
       <li><strong>Pronunciation:</strong> TH sound review (voiced vs. voiceless) + introduction to English word stress patterns.</li>
-      <li><strong>Speaking:</strong> Co-op adventure planner — Raphael and teacher built a Minecraft plan using future tense, practising conversational turn-taking.</li>
+      <li><strong>Speaking:</strong> Co-op adventure planner — the student and teacher built a Minecraft plan using future tense, practising conversational turn-taking.</li>
       <li><strong>Review:</strong> Past tense irregular verbs (Lessons 1–3) reinforced through sorting and quiz questions.</li>
       <li><strong>Next Lesson Preview:</strong> Comparatives and superlatives — "bigger," "the biggest," "more exciting."</li>
-      <li><strong>At Home:</strong> Ask Raphael "What are you going to do tomorrow?" and "Will you…?" questions. Encourage full-sentence answers. Practise word stress by clapping syllables together.</li>
+      <li><strong>At Home:</strong> Ask the student "What are you going to do tomorrow?" and "Will you…?" questions. Encourage full-sentence answers. Practise word stress by clapping syllables together.</li>
     </ul>
   </div>
   <div class="btn-row" style="margin-top:24px"><button class="btn" onclick="location.reload()">Play Again 🔄</button></div>
@@ -522,8 +522,8 @@ function rollCrystal(){
   let t=crystalTopics[Math.floor(Math.random()*crystalTopics.length)];
   document.getElementById('crystalTopic').textContent='🔮 '+t.toUpperCase();
   let isRaph=crystalDone%2===0;
-  document.getElementById('crystalTurn').className='turn-banner '+(isRaph?'raphael':'teacher');
-  document.getElementById('crystalTurn').textContent=isRaph?"🧑‍💻 Raphael's turn – say a sentence!":"🎓 Teacher's turn – say a sentence!";
+  document.getElementById('crystalTurn').className='turn-banner '+(isRaph?'student':'teacher');
+  document.getElementById('crystalTurn').textContent=isRaph?"🧑‍💻 The student's turn – say a sentence!":"🎓 Teacher's turn – say a sentence!";
 }
 function crystalCorrect(){
   crystalDone++;addXP(15);
@@ -630,15 +630,15 @@ function updateCoopTurn(){
   let isRaph=coopTurn%2===0;
   let banner=document.getElementById('coopTurn');
   let turnType=coopTurn%4<2?'plan sentence':'follow-up question';
-  banner.className='turn-banner '+(isRaph?'raphael':'teacher');
-  banner.textContent=(isRaph?"🧑‍💻 Raphael":"🎓 Teacher")+"'s Turn – Write a "+turnType+"!";
+  banner.className='turn-banner '+(isRaph?'student':'teacher');
+  banner.textContent=(isRaph?"🧑‍💻 student":"🎓 Teacher")+"'s Turn – Write a "+turnType+"!";
 }
 function submitCoopSentence(){
   let input=document.getElementById('coopInput');
   let val=input.value.trim();
   if(!val)return;
   let isRaph=coopTurn%2===0;
-  coopSentences.push({text:val,who:isRaph?'Raphael':'Teacher'});
+  coopSentences.push({text:val,who:isRaph?'student':'Teacher'});
   let bank=document.getElementById('coopSentences');
   let row=document.createElement('div');row.className='sentence-row';
   row.innerHTML=`<span class="num">${coopSentences.length}.</span><span style="color:${isRaph?'var(--green)':'var(--purple)'};font-weight:700">[${isRaph?'R':'T'}]</span><span>${val}</span>`;
