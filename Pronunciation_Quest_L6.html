@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pronunciation Quest — Lesson 1.6</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700;800&display=swap');
+
+  :root {
+    --ocean: #0A1628;
+    --deep:  #061020;
+    --gold:  #F5C842;
+    --red:   #E8312A;
+    --teal:  #1CB8A0;
+    --white: #F0EDE8;
+    --gray:  #7A8FA6;
+    --card:  #0F2240;
+    --card2: #132A4E;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--ocean);
+    font-family: 'Nunito', sans-serif;
+    color: var(--white);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Animated ocean background ── */
+  body::before {
+    content:'';
+    position:fixed; inset:0;
+    background:
+      radial-gradient(ellipse 80% 40% at 50% 120%, rgba(28,184,160,0.12) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 30% at 80% 0%, rgba(245,200,66,0.06) 0%, transparent 60%);
+    pointer-events:none;
+    z-index:0;
+  }
+
+  /* ── Wave decorations ── */
+  .waves {
+    position:fixed; bottom:0; left:0; width:100%; height:120px;
+    pointer-events:none; z-index:0; opacity:0.18;
+  }
+  .waves svg { width:100%; height:100%; }
+
+  /* ── Header ── */
+  header {
+    position:relative; z-index:2;
+    text-align:center;
+    padding:2rem 1rem 1rem;
+    border-bottom:2px solid rgba(245,200,66,0.2);
+  }
+  .logo-row { display:flex; align-items:center; justify-content:center; gap:0.75rem; margin-bottom:0.25rem; }
+  .logo-icon { font-size:2.5rem; }
+  h1 {
+    font-family:'Bangers', cursive;
+    font-size:clamp(2rem,5vw,3.2rem);
+    color:var(--gold);
+    letter-spacing:3px;
+    text-shadow:3px 3px 0 rgba(0,0,0,0.4);
+  }
+  .subtitle {
+    font-size:1rem; color:var(--gray); font-weight:600; letter-spacing:1px;
+    text-transform:uppercase; margin-top:0.2rem;
+  }
+
+  /* ── Progress / score bar ── */
+  .hud {
+    position:relative; z-index:2;
+    display:flex; align-items:center; justify-content:space-between;
+    max-width:780px; margin:1rem auto 0; padding:0 1.5rem;
+    gap:1rem;
+  }
+  .score-box {
+    background:var(--card); border:2px solid var(--gold);
+    border-radius:10px; padding:0.4rem 1rem;
+    font-family:'Bangers',cursive; font-size:1.5rem;
+    color:var(--gold); letter-spacing:2px; min-width:100px; text-align:center;
+  }
+  .score-label { font-size:0.7rem; color:var(--gray); letter-spacing:1px; text-transform:uppercase; }
+  .progress-wrap { flex:1; }
+  .progress-bar-bg {
+    background:rgba(255,255,255,0.08); border-radius:100px;
+    height:14px; overflow:hidden;
+  }
+  .progress-bar-fill {
+    height:100%; border-radius:100px;
+    background:linear-gradient(90deg,var(--teal),var(--gold));
+    transition:width 0.5s ease;
+    width:0%;
+  }
+  .progress-label {
+    font-size:0.75rem; color:var(--gray);
+    margin-top:0.3rem; text-align:center; font-weight:700;
+  }
+  .lives { display:flex; gap:0.3rem; font-size:1.5rem; }
+
+  /* ── Game area ── */
+  main {
+    position:relative; z-index:2;
+    max-width:780px; margin:1.5rem auto 6rem;
+    padding:0 1.5rem;
+  }
+
+  /* ── Phase label ── */
+  .phase-badge {
+    display:inline-flex; align-items:center; gap:0.5rem;
+    background:var(--card); border:2px solid var(--teal);
+    border-radius:100px; padding:0.3rem 1rem;
+    font-size:0.85rem; font-weight:800; color:var(--teal);
+    text-transform:uppercase; letter-spacing:1px;
+    margin-bottom:1.2rem;
+  }
+
+  /* ── Word card (center stage) ── */
+  .word-card {
+    background:var(--card);
+    border:3px solid var(--gold);
+    border-radius:20px;
+    padding:2rem 1.5rem 1.5rem;
+    text-align:center;
+    box-shadow:0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(245,200,66,0.1);
+    margin-bottom:1.5rem;
+    transition:transform 0.2s;
+  }
+  .word-emoji { font-size:4rem; margin-bottom:0.5rem; display:block; }
+  .word-target {
+    font-family:'Bangers',cursive;
+    font-size:clamp(2.8rem,8vw,4.5rem);
+    color:var(--white);
+    letter-spacing:4px;
+    line-height:1;
+    margin-bottom:0.5rem;
+  }
+  .word-syllables {
+    font-size:1.2rem; color:var(--teal); font-weight:700; letter-spacing:3px;
+    margin-bottom:0.8rem;
+  }
+  .word-hint {
+    font-size:1rem; color:var(--gray);
+    background:rgba(255,255,255,0.05);
+    border-radius:8px; padding:0.5rem 1rem;
+    display:inline-block;
+  }
+  .sound-btn {
+    margin-top:1.2rem;
+    background:var(--teal); color:var(--deep);
+    border:none; border-radius:12px;
+    padding:0.7rem 2rem; font-size:1rem;
+    font-family:'Nunito',sans-serif; font-weight:800;
+    cursor:pointer; transition:all 0.15s;
+    display:inline-flex; align-items:center; gap:0.5rem;
+    letter-spacing:0.5px;
+  }
+  .sound-btn:hover { background:var(--gold); transform:scale(1.04); }
+  .sound-btn:active { transform:scale(0.97); }
+
+  /* ── Choices grid ── */
+  .question-prompt {
+    font-size:1.15rem; font-weight:700; color:var(--white);
+    margin-bottom:1rem; text-align:center;
+  }
+  .choices {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:0.85rem;
+    margin-bottom:1.5rem;
+  }
+  .choice-btn {
+    background:var(--card2);
+    border:2px solid rgba(255,255,255,0.12);
+    border-radius:14px;
+    padding:1rem 0.75rem;
+    font-family:'Nunito',sans-serif;
+    font-size:1.05rem; font-weight:700;
+    color:var(--white);
+    cursor:pointer;
+    transition:all 0.18s;
+    text-align:center; line-height:1.3;
+  }
+  .choice-btn:hover { border-color:var(--gold); background:#1a3560; transform:translateY(-2px); }
+  .choice-btn.correct { background:#0d3a2a; border-color:#2ecc71; color:#2ecc71; }
+  .choice-btn.wrong   { background:#3a0d0d; border-color:#e74c3c; color:#e74c3c; }
+  .choice-btn:disabled { cursor:default; transform:none; }
+
+  /* ── Feedback banner ── */
+  .feedback {
+    text-align:center; padding:0.9rem;
+    border-radius:12px; font-size:1.1rem; font-weight:800;
+    margin-bottom:1.2rem; display:none;
+    animation:pop 0.25s ease;
+  }
+  .feedback.show { display:block; }
+  .feedback.correct { background:#0d3a2a; color:#2ecc71; border:2px solid #2ecc71; }
+  .feedback.wrong   { background:#3a0d0d; color:#e74c3c; border:2px solid #e74c3c; }
+  @keyframes pop { from{transform:scale(0.9);opacity:0} to{transform:scale(1);opacity:1} }
+
+  /* ── Next btn ── */
+  .next-btn {
+    display:block; width:100%;
+    background:var(--gold); color:var(--deep);
+    border:none; border-radius:14px;
+    padding:1rem; font-family:'Bangers',cursive;
+    font-size:1.6rem; letter-spacing:3px;
+    cursor:pointer; transition:all 0.18s;
+    display:none;
+  }
+  .next-btn.show { display:block; }
+  .next-btn:hover { background:#ffe066; transform:scale(1.02); }
+
+  /* ── Win screen ── */
+  #win-screen {
+    display:none; text-align:center;
+    animation:pop 0.4s ease;
+  }
+  #win-screen.show { display:block; }
+  .win-icon { font-size:5rem; margin-bottom:0.5rem; }
+  .win-title {
+    font-family:'Bangers',cursive;
+    font-size:3.5rem; color:var(--gold);
+    letter-spacing:4px; text-shadow:3px 3px 0 rgba(0,0,0,0.4);
+    margin-bottom:0.5rem;
+  }
+  .win-sub { font-size:1.1rem; color:var(--gray); margin-bottom:1.5rem; }
+  .win-score {
+    font-family:'Bangers',cursive; font-size:2.5rem;
+    color:var(--teal); letter-spacing:3px; margin-bottom:1.5rem;
+  }
+  .restart-btn {
+    background:var(--red); color:var(--white);
+    border:none; border-radius:14px;
+    padding:1rem 2.5rem; font-family:'Bangers',cursive;
+    font-size:1.8rem; letter-spacing:3px;
+    cursor:pointer; transition:all 0.18s;
+  }
+  .restart-btn:hover { background:#ff4a42; transform:scale(1.03); }
+
+  /* ── Lesson link ── */
+  .lesson-link {
+    display:inline-block; margin-top:1rem;
+    background:var(--card); border:2px solid var(--teal);
+    border-radius:10px; padding:0.6rem 1.2rem;
+    color:var(--teal); font-weight:700; text-decoration:none;
+    font-size:0.95rem; transition:all 0.18s;
+  }
+  .lesson-link:hover { background:var(--teal); color:var(--deep); }
+
+  /* ── Tooltip / instruction ── */
+  .instructions {
+    background:var(--card); border:2px solid rgba(255,255,255,0.1);
+    border-radius:14px; padding:1rem 1.2rem;
+    font-size:1rem; color:var(--gray); margin-bottom:1.5rem;
+    line-height:1.6;
+  }
+  .instructions strong { color:var(--white); }
+
+  /* ── Phase: LISTEN mode ── */
+  #listen-mode .question-prompt { font-size:1.3rem; }
+</style>
+</head>
+<body>
+
+<div class="waves">
+  <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+    <path d="M0,60 C200,110 400,10 600,60 C800,110 1000,10 1200,60 L1200,120 L0,120 Z" fill="#1CB8A0"/>
+  </svg>
+</div>
+
+<header>
+  <div class="logo-row">
+    <span class="logo-icon">⚓</span>
+    <h1>PRONUNCIATION QUEST</h1>
+    <span class="logo-icon">🏴‍☠️</span>
+  </div>
+  <p class="subtitle">Lesson 1.6 · English Sound Training · One Piece Edition</p>
+</header>
+
+<div class="hud">
+  <div>
+    <div class="score-label">XP</div>
+    <div class="score-box" id="score-display">0</div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progress-fill"></div>
+    </div>
+    <div class="progress-label" id="progress-label">Word 1 of 10</div>
+  </div>
+  <div class="lives" id="lives-display">❤️❤️❤️</div>
+</div>
+
+<main>
+  <!-- Game rounds -->
+  <div id="game-area">
+    <div class="phase-badge" id="phase-badge">🎯 Phase 1 — Identify</div>
+
+    <div class="word-card" id="word-card">
+      <span class="word-emoji" id="word-emoji">⚓</span>
+      <div class="word-target" id="word-target">NAVIGATE</div>
+      <div class="word-syllables" id="word-syllables">nav · i · gate</div>
+      <div class="word-hint" id="word-hint">What Luffy does across the Grand Line</div>
+      <button class="sound-btn" id="sound-btn" onclick="speakWord()">🔊 Hear It</button>
+    </div>
+
+    <p class="question-prompt" id="question-prompt">How many syllables does this word have?</p>
+
+    <div class="choices" id="choices-grid"></div>
+
+    <div class="feedback" id="feedback"></div>
+
+    <button class="next-btn" id="next-btn" onclick="nextRound()">NEXT WORD →</button>
+  </div>
+
+  <!-- Win screen -->
+  <div id="win-screen">
+    <div class="win-icon">🏆</div>
+    <div class="win-title">QUEST COMPLETE!</div>
+    <div class="win-sub">You've mastered the pronunciation words of Lesson 1.6!</div>
+    <div class="win-score" id="final-score">Score: 0 XP</div>
+    <button class="restart-btn" onclick="restartGame()">⚓ PLAY AGAIN</button>
+    <br>
+    <a class="lesson-link" href="#" onclick="return false;">← Back to Lesson Slides</a>
+  </div>
+</main>
+
+<script>
+// ── Word bank ──────────────────────────────────────────────────────────────────
+// Each word: word, syllables, syllableCount, emoji, hint, source (game/OP), pronunciation IPA tip
+const WORDS = [
+  // One Piece vocabulary (Extend / Demonstrate phase in class)
+  { word:"NAVIGATE",  syl:"nav · i · gate", count:3, emoji:"⚓", hint:"What Luffy does across the Grand Line", q:"syllables" },
+  { word:"ADVENTURE", syl:"ad · ven · ture", count:3, emoji:"🌊", hint:"The whole point of One Piece!", q:"syllables" },
+  { word:"TREASURE",  syl:"treas · ure",     count:2, emoji:"💎", hint:"The One Piece itself!", q:"syllables" },
+  { word:"CAPTAIN",   syl:"cap · tain",      count:2, emoji:"🏴‍☠️", hint:"Luffy's title on the Straw Hat crew", q:"syllables" },
+  { word:"EXPLORE",   syl:"ex · plore",      count:2, emoji:"🗺️", hint:"Go to new places — like a game verb!", q:"syllables" },
+  // Game vocabulary
+  { word:"CRAFTING",  syl:"craft · ing",     count:2, emoji:"⛏️", hint:"Making items in Minecraft", q:"syllables" },
+  { word:"SURVIVE",   syl:"sur · vive",      count:2, emoji:"🛡️", hint:"Don't die! A key goal in any game", q:"syllables" },
+  { word:"DISCOVERY", syl:"dis · cov · er · y", count:4, emoji:"🔭", hint:"Finding something brand new", q:"syllables" },
+  { word:"CHALLENGE", syl:"chal · lenge",    count:2, emoji:"⚔️", hint:"A hard task you try to beat", q:"syllables" },
+  { word:"LEGENDARY", syl:"leg · end · ar · y", count:4, emoji:"⭐", hint:"Rare, epic — like a legendary item drop", q:"syllables" },
+];
+
+// ── Question generators ────────────────────────────────────────────────────────
+function makeSyllableQ(word) {
+  const correct = word.count;
+  const wrong = new Set();
+  while(wrong.size < 3) {
+    const n = Math.floor(Math.random()*4)+1;
+    if(n !== correct) wrong.add(n);
+  }
+  const opts = shuffle([correct, ...wrong]).map(n => ({
+    label: n + (n===1?" syllable":" syllables"),
+    value: n,
+    correct: n === correct
+  }));
+  return { prompt:"How many syllables does this word have?", opts };
+}
+
+function makeSoundMatchQ(word) {
+  // Which word rhymes with / starts with same sound
+  const starters = {
+    NAVIGATE:  { prompt:'Which word starts with the same sound as "NAV..."?', opts:[
+      {label:"NEVER",correct:true},{label:"GAVE",correct:false},{label:"BRAVE",correct:false},{label:"WAVE",correct:false}
+    ]},
+    ADVENTURE: { prompt:'Which word sounds like the start of "AD-ven-ture"?', opts:[
+      {label:"ADD",correct:true},{label:"AID",correct:false},{label:"ODD",correct:false},{label:"AND",correct:false}
+    ]},
+    TREASURE:  { prompt:'Which word rhymes with "TREAS-ure"?', opts:[
+      {label:"MEASURE",correct:true},{label:"TEACHER",correct:false},{label:"LEISURE",correct:false},{label:"FEATURE",correct:false}
+    ]},
+    CAPTAIN:   { prompt:'Which word has the same ENDING sound as "cap-TAIN"?', opts:[
+      {label:"RAIN",correct:true},{label:"TEN",correct:false},{label:"TIME",correct:false},{label:"TON",correct:false}
+    ]},
+    EXPLORE:   { prompt:'Which word rhymes with "ex-PLORE"?', opts:[
+      {label:"MORE",correct:true},{label:"MOLE",correct:false},{label:"MOVE",correct:false},{label:"MARE",correct:false}
+    ]},
+    CRAFTING:  { prompt:'Which word starts with the same sound as "CRAFT..."?', opts:[
+      {label:"CRAZY",correct:true},{label:"GRACE",correct:false},{label:"TRAP",correct:false},{label:"FACT",correct:false}
+    ]},
+    SURVIVE:   { prompt:'Which word rhymes with "sur-VIVE"?', opts:[
+      {label:"DRIVE",correct:true},{label:"DOVE",correct:false},{label:"DIVE",correct:true},{label:"FIVE",correct:true}
+    ]},
+    DISCOVERY: { prompt:'Which word starts like "dis-COV..."?', opts:[
+      {label:"COVER",correct:true},{label:"COVET",correct:false},{label:"COVE",correct:false},{label:"MOVE",correct:false}
+    ]},
+    CHALLENGE: { prompt:'Which word starts with the same sound as "CHAL..."?', opts:[
+      {label:"CHAR",correct:true},{label:"CALL",correct:false},{label:"TALE",correct:false},{label:"HALL",correct:false}
+    ]},
+    LEGENDARY: { prompt:'Which word starts like "LEG..."?', opts:[
+      {label:"LEGAL",correct:true},{label:"LARGE",correct:false},{label:"LEAGUE",correct:false},{label:"LEDGE",correct:false}
+    ]},
+  };
+  const d = starters[word.word] || null;
+  if(!d) return makeSyllableQ(word); // fallback
+  // Normalize: only one correct
+  const corrects = d.opts.filter(o=>o.correct);
+  const wrongs   = d.opts.filter(o=>!o.correct);
+  const correct  = corrects[0];
+  const opts = shuffle([correct, ...wrongs.slice(0,3)]).map(o=>({...o,correct:o===correct}));
+  return { prompt: d.prompt, opts };
+}
+
+// ── Game state ─────────────────────────────────────────────────────────────────
+let queue = [], current = 0, score = 0, lives = 3, answered = false;
+let currentQ = null;
+
+// Round 1 (words 1-5): syllable count
+// Round 2 (words 6-10): sound match
+function buildQueue() {
+  const shuffled = shuffle([...WORDS]);
+  return shuffled.map((w, i) => ({ word: w, type: i < 5 ? 'syllables' : 'sound' }));
+}
+
+function shuffle(arr) {
+  const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a;
+}
+
+function startGame() {
+  queue = buildQueue();
+  current = 0; score = 0; lives = 3; answered = false;
+  document.getElementById('win-screen').classList.remove('show');
+  document.getElementById('game-area').style.display = 'block';
+  renderRound();
+}
+
+function renderRound() {
+  answered = false;
+  const item = queue[current];
+  const w = item.word;
+
+  // Phase badge
+  const phase = current < 5 ? '🎯 Phase 1 — Syllables' : '🔊 Phase 2 — Sounds';
+  document.getElementById('phase-badge').textContent = phase;
+
+  // Word card
+  document.getElementById('word-emoji').textContent = w.emoji;
+  document.getElementById('word-target').textContent = w.word;
+  document.getElementById('word-syllables').textContent = w.syl;
+  document.getElementById('word-hint').textContent = w.hint;
+
+  // Question
+  currentQ = item.type === 'syllables' ? makeSyllableQ(w) : makeSoundMatchQ(w);
+  document.getElementById('question-prompt').textContent = currentQ.prompt;
+
+  // Choices
+  const grid = document.getElementById('choices-grid');
+  grid.innerHTML = '';
+  currentQ.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = opt.label;
+    btn.onclick = () => selectAnswer(btn, opt.correct, i);
+    grid.appendChild(btn);
+  });
+
+  // Hide feedback + next
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback'; fb.textContent = '';
+  document.getElementById('next-btn').className = 'next-btn';
+
+  // Progress
+  const pct = (current / queue.length) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = `Word ${current+1} of ${queue.length}`;
+  document.getElementById('score-display').textContent = score + ' XP';
+  renderLives();
+}
+
+function selectAnswer(btn, isCorrect, idx) {
+  if(answered) return;
+  answered = true;
+  const btns = document.querySelectorAll('.choice-btn');
+  btns.forEach(b => b.disabled = true);
+
+  const fb = document.getElementById('feedback');
+  if(isCorrect) {
+    btn.classList.add('correct');
+    fb.textContent = '✅ Excellent! +20 XP — Say it out loud now!';
+    fb.className = 'feedback show correct';
+    score += 20;
+  } else {
+    btn.classList.add('wrong');
+    // Highlight correct
+    btns.forEach((b,i) => { if(currentQ.opts[i].correct) b.classList.add('correct'); });
+    fb.textContent = '❌ Not quite — look at the correct answer and say the word!';
+    fb.className = 'feedback show wrong';
+    lives = Math.max(0, lives-1);
+    renderLives();
+  }
+  document.getElementById('score-display').textContent = score + ' XP';
+  document.getElementById('next-btn').className = 'next-btn show';
+}
+
+function renderLives() {
+  const hearts = ['❤️','❤️','❤️'].map((h,i) => i < lives ? '❤️' : '🖤').join('');
+  document.getElementById('lives-display').textContent = hearts;
+}
+
+function nextRound() {
+  current++;
+  if(current >= queue.length) {
+    showWin(); return;
+  }
+  renderRound();
+}
+
+function showWin() {
+  document.getElementById('game-area').style.display = 'none';
+  const ws = document.getElementById('win-screen');
+  ws.classList.add('show');
+  document.getElementById('final-score').textContent = `Final Score: ${score} XP  |  ❤️ ${lives} lives left`;
+  document.getElementById('progress-fill').style.width = '100%';
+  document.getElementById('progress-label').textContent = 'Quest Complete!';
+}
+
+function restartGame() { startGame(); }
+
+function speakWord() {
+  const word = document.getElementById('word-target').textContent;
+  if('speechSynthesis' in window) {
+    const utter = new SpeechSynthesisUtterance(word.toLowerCase());
+    utter.lang = 'en-US'; utter.rate = 0.85; utter.pitch = 1;
+    speechSynthesis.cancel();
+    speechSynthesis.speak(utter);
+  }
+}
+
+// Start on load
+window.addEventListener('load', startGame);
+</script>
+</body>
+</html>
